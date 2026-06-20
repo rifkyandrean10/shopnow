@@ -1,37 +1,19 @@
-import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { NextResponse } from "next/server";
 
-export async function PATCH(
+export async function DELETE(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  context: any
 ) {
-  try {
-    const { id } = await params;
+  const { id } = await context.params;
 
-    const body = await request.json();
+  await prisma.product.delete({
+    where: {
+      id,
+    },
+  });
 
-    const product =
-      await prisma.product.update({
-        where: {
-          id,
-        },
-        data: {
-          name: body.name,
-          description: body.description,
-          price: Number(body.price),
-          stock: Number(body.stock),
-          image: body.image,
-          category: body.category,
-        },
-      });
-
-    return NextResponse.json(product);
-  } catch (error) {
-    console.error(error);
-
-    return NextResponse.json(
-      { error: "Failed to update product" },
-      { status: 500 }
-    );
-  }
+  return NextResponse.json({
+    success: true,
+  });
 }
