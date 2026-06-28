@@ -1,44 +1,43 @@
-import Link from "next/link";
-import { ShoppingCart } from "lucide-react";
-import { prisma } from "@/lib/prisma";
+// src/components/layout/navbar.tsx
+"use client";
 
-export default async function Navbar() {
-  const cartCount = await prisma.cartItem.count();
+import Link from "next/link"; // Diperbaiki: dari "next/link"
+import { useSession, signIn, signOut } from "next-auth/react";
+import { Button } from "@/components/ui/button";
+
+export function Navbar() {
+  const { data: session, status } = useSession();
 
   return (
-    <header className="border-b bg-white">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
-        <Link
-          href="/"
-          className="text-3xl font-bold"
-        >
-          ShopNow
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
+      <div className="container flex h-16 items-center justify-between">
+        <Link href="/" className="flex items-center gap-2">
+          <span className="text-xl font-bold">ShopNow</span>
         </Link>
 
-        <nav className="flex items-center gap-8">
-          <Link href="/">Home</Link>
-
-          <Link href="/products">
-            Products
-          </Link>
-
-          <Link href="/wishlist">
-            Wishlist
-          </Link>
-
-          <Link
-            href="/cart"
-            className="relative"
-          >
-            <ShoppingCart size={26} />
-
-            {cartCount > 0 && (
-              <span className="absolute -right-3 -top-3 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
-                {cartCount}
+        <div className="flex items-center gap-4">
+          {status === "loading" ? (
+            <p className="text-sm text-muted-foreground">Loading...</p>
+          ) : session ? (
+            <div className="flex items-center gap-4">
+              <span className="text-sm hidden sm:inline-block">
+                Halo, {session.user?.name || session.user?.email}
               </span>
-            )}
-          </Link>
-        </nav>
+              {(session.user as any)?.role === "SELLER" && (
+                <Link href="/seller">
+                  <Button variant="outline" size="sm">Dasbor Penjual</Button>
+                </Link>
+              )}
+              <Button onClick={() => signOut()} variant="destructive" size="sm">
+                Logout
+              </Button>
+            </div>
+          ) : (
+            <Button onClick={() => signIn()} size="sm">
+              Login
+            </Button>
+          )}
+        </div>
       </div>
     </header>
   );

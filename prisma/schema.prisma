@@ -1,82 +1,61 @@
-generator client {
-  provider = "prisma-client-js"
+// Tambahkan model untuk NextAuth
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?  @db.Text
+  access_token       String?  @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?  @db.Text
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
 }
 
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model User {
-  id        String    @id @default(cuid())
-  name      String
-  email     String    @unique
-  createdAt DateTime  @default(now())
-  orders    Order[]
-  products  Product[]
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  password      String?   // Pastikan baris ini ada
+  emailVerified DateTime?
+  image         String?
+  role          String    @default("BUYER")
+  accounts      Account[]
+  sessions      Session[]
+  orders        Order[]
 }
 
-model Product {
-  id          String   @id @default(cuid())
-  name        String
-  description String
-  price       Float
-  stock       Int
-  image       String
-  sellerId    String
-  createdAt   DateTime @default(now())
-  category    String   @default("General")
-
-  seller      User     @relation(fields: [sellerId], references: [id])
-
-  cartItems   CartItem[]
-
-  wishlistItems Wishlist[]
-
-  orderItems OrderItem[]
-}
-
+// Perbarui model Order yang sudah ada (atau tambahkan jika belum lengkap)
 model Order {
-  id            String      @id @default(cuid())
-  total         Float
-  userId        String
-  customerName  String
-  customerEmail String
-  phone         String
-  address       String
-  paymentMethod String
-  status        String      @default("PENDING")
-  createdAt     DateTime    @default(now())
-  user          User        @relation(fields: [userId], references: [id])
-  items         OrderItem[]
-}
-
-model OrderItem {
-  id        String  @id @default(cuid())
-  orderId   String
-  productId String
-  quantity  Int
-  price     Float
-  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  product   Product @relation(fields: [productId], references: [id])
-}
-
-model CartItem {
-  id        String   @id @default(cuid())
-
-  productId String
-  product   Product  @relation(fields: [productId], references: [id])
-
-  quantity  Int      @default(1)
-
-  createdAt DateTime @default(now())
-}
-
-model Wishlist {
-  id        String   @id @default(cuid())
-
-  productId String   @unique
-  product   Product  @relation(fields: [productId], references: [id])
-
-  createdAt DateTime @default(now())
+  id            String   @id @default(cuid())
+  userId        String?  // Relasi ke User (bisa null jika membolehkan guest checkout)
+  user          User?    @relation(fields: [userId], references: [id])
+  
+  totalAmount   Float
+  status        String   @default("PENDING") // PENDING, PROCESSING, SHIPPED, DELIVERED
+  
+  // Kebutuhan Payment Gateway (Midtrans)
+  paymentStatus String   @default("UNPAID") // UNPAID, PAID, FAILED
+  paymentUrl    String?  // URL Snap Midtrans untuk dibayar user
+  orderIdString String?  @unique // ID pesanan khusus format Midtrans
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relasi ke item order yang ada di cart/checkout sebelumnya
+  // orderItems    OrderItem[] 
 }

@@ -1,5 +1,4 @@
-import Footer from "@/components/layout/footer";
-
+// src/app/page.tsx
 import Hero from "@/components/home/hero";
 import Categories from "@/components/home/categories";
 import FeaturedProducts from "@/components/home/featured-products";
@@ -14,7 +13,6 @@ export default function Home() {
       <FeaturedProducts />
       <WhyShopNow />
       <CtaBanner />
-      <Footer />
     </>
   );
 }
