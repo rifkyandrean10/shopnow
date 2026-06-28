@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
-import { ThemeProvider } from "@/components/theme-provider";
+import Navbar from "@/components/layout/navbar";
 
 export const metadata: Metadata = {
   title: "ShopNow",
-  description: "Modern E-Commerce Platform",
+  description: "Modern Ecommerce",
 };
 
 export default function RootLayout({
@@ -14,14 +14,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      suppressHydrationWarning
-    >
+    <html lang="en">
       <body>
-        <ThemeProvider>
-          {children}
-        </ThemeProvider>
+        <Navbar />
+
+        {children}
       </body>
     </html>
   );

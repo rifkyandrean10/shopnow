@@ -26,13 +26,57 @@ model Product {
   sellerId    String
   createdAt   DateTime @default(now())
   category    String   @default("General")
+
   seller      User     @relation(fields: [sellerId], references: [id])
+
+  cartItems   CartItem[]
+
+  wishlistItems Wishlist[]
+
+  orderItems OrderItem[]
 }
 
 model Order {
+  id            String      @id @default(cuid())
+  total         Float
+  userId        String
+  customerName  String
+  customerEmail String
+  phone         String
+  address       String
+  paymentMethod String
+  status        String      @default("PENDING")
+  createdAt     DateTime    @default(now())
+  user          User        @relation(fields: [userId], references: [id])
+  items         OrderItem[]
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  productId String
+  quantity  Int
+  price     Float
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+model CartItem {
   id        String   @id @default(cuid())
-  total     Float
-  userId    String
+
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+
+  quantity  Int      @default(1)
+
   createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Wishlist {
+  id        String   @id @default(cuid())
+
+  productId String   @unique
+  product   Product  @relation(fields: [productId], references: [id])
+
+  createdAt DateTime @default(now())
 }

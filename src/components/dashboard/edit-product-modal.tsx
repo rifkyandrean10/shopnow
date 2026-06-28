@@ -1,9 +1,11 @@
 "use client";
 
+import type { Product } from "@prisma/client";
+
 export default function EditProductModal({
   product,
 }: {
-  product: any;
+  product: Product;
 }) {
   async function handleSubmit() {
     const res = await fetch(

@@ -1,82 +1,44 @@
-import { Heart, Menu, Search, ShoppingCart, User } from "lucide-react";
+import Link from "next/link";
+import { ShoppingCart } from "lucide-react";
+import { prisma } from "@/lib/prisma";
 
-export default function Navbar() {
+export default async function Navbar() {
+  const cartCount = await prisma.cartItem.count();
+
   return (
-    <header className="sticky top-0 z-50 border-b border-white/20 bg-white/80 backdrop-blur-xl">
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
-        {/* Logo */}
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-2xl bg-black" />
+    <header className="border-b bg-white">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
+        <Link
+          href="/"
+          className="text-3xl font-bold"
+        >
+          ShopNow
+        </Link>
 
-          <div>
-            <h1 className="text-xl font-bold">
-              ShopNow
-            </h1>
+        <nav className="flex items-center gap-8">
+          <Link href="/">Home</Link>
 
-            <p className="text-xs text-muted-foreground">
-              Premium Store
-            </p>
-          </div>
-        </div>
-
-        {/* Menu Desktop */}
-        <nav className="hidden items-center gap-8 md:flex">
-          <a
-            href="#"
-            className="font-medium transition hover:text-blue-600"
-          >
+          <Link href="/products">
             Products
-          </a>
+          </Link>
 
-          <a
-            href="#"
-            className="font-medium transition hover:text-blue-600"
-          >
-            Categories
-          </a>
+          <Link href="/wishlist">
+            Wishlist
+          </Link>
 
-          <a
-            href="#"
-            className="font-medium transition hover:text-blue-600"
+          <Link
+            href="/cart"
+            className="relative"
           >
-            Deals
-          </a>
+            <ShoppingCart size={26} />
+
+            {cartCount > 0 && (
+              <span className="absolute -right-3 -top-3 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
+                {cartCount}
+              </span>
+            )}
+          </Link>
         </nav>
-
-        {/* Search */}
-        <div className="hidden lg:block">
-          <div className="flex items-center gap-2 rounded-2xl border bg-white px-4 py-2 shadow-sm">
-            <Search size={18} />
-
-            <input
-              type="text"
-              placeholder="Search products..."
-              className="w-64 bg-transparent outline-none"
-            />
-          </div>
-        </div>
-
-        {/* Actions */}
-        <div className="flex items-center gap-4">
-          <Heart
-            size={22}
-            className="cursor-pointer transition hover:scale-110"
-          />
-
-          <ShoppingCart
-            size={22}
-            className="cursor-pointer transition hover:scale-110"
-          />
-
-          <User
-            size={22}
-            className="cursor-pointer transition hover:scale-110"
-          />
-
-          <button className="md:hidden">
-            <Menu size={24} />
-          </button>
-        </div>
       </div>
     </header>
   );

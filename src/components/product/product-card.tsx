@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Heart, Star } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/format";
@@ -22,6 +23,22 @@ interface ProductCardProps {
 export default function ProductCard({
   product,
 }: ProductCardProps) {
+  const router = useRouter();
+
+  async function addToWishlist() {
+    await fetch("/api/wishlist", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        productId: product.id,
+      }),
+    });
+
+    router.refresh();
+  }
+
   return (
     <Link
       href={`/products/${product.id}`}
@@ -36,8 +53,12 @@ export default function ProductCard({
 
         <button
           type="button"
-          onClick={(e) => e.preventDefault()}
+          onClick={(e) => {
+            e.preventDefault();
+            addToWishlist();
+          }}
           className="absolute right-4 top-4 rounded-full bg-white p-2 shadow-md"
+          aria-label="Add to wishlist"
         >
           <Heart
             size={18}

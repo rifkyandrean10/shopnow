@@ -7,7 +7,24 @@ export async function DELETE(
 ) {
   const { id } = await params;
 
-  await prisma.product.delete({
+  const wishlist = await prisma.wishlist.findUnique({
+    where: {
+      id,
+    },
+  });
+
+  if (!wishlist) {
+    return NextResponse.json(
+      {
+        message: "Wishlist item not found",
+      },
+      {
+        status: 404,
+      }
+    );
+  }
+
+  await prisma.wishlist.delete({
     where: {
       id,
     },

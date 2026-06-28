@@ -3,20 +3,38 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export default function SearchBar() {
+interface SearchBarProps {
+  category?: string;
+  defaultValue?: string;
+}
+
+export default function SearchBar({
+  category,
+  defaultValue = "",
+}: SearchBarProps) {
   const router = useRouter();
 
   const [keyword, setKeyword] =
-    useState("");
+    useState(defaultValue);
 
   function handleSearch(
     e: React.FormEvent
   ) {
     e.preventDefault();
 
-    router.push(
-      `/products?search=${keyword}`
-    );
+    const params = new URLSearchParams();
+
+    if (keyword.trim()) {
+      params.set("search", keyword.trim());
+    }
+
+    if (category) {
+      params.set("category", category);
+    }
+
+    const query = params.toString();
+
+    router.push(query ? `/products?${query}` : "/products");
   }
 
   return (
